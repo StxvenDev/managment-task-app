@@ -1,11 +1,18 @@
 import express from 'express'
+import cors from 'cors'
 import { initDatabase } from './database.js';
+import userRouter from '../routers/user.routes.js';
 
-class Server {
+export class Server {
   constructor() {
     this.app = express();
     this.port = process.env.PORT;
+    this.paths = {
+      user : '/api/user'
+    }
     this.database();
+    this.middleware();
+    this.routers();
   }
 
   database(){
@@ -14,21 +21,19 @@ class Server {
       .catch(console.error);
   }
 
-  middleware() {
-
+  middleware(){
+    this.app.use(cors());
+    this.app.use(express.urlencoded());
+    this.app.use(express.json());
   }
 
   routers(){
-
+    this.app.use(this.paths.user, userRouter);
   }
 
   listen() {
-    this.app.listen(() => {
+    this.app.listen(this.port, () => {
       console.log(`Server is running in port ${this.port}`);
     })
   }
-
 }
-
-
-export default Server;
